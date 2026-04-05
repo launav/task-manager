@@ -1,4 +1,128 @@
+<mat-toolbar color="primary" class="toolbar">
+  <span>Gestor de tareas</span>
+</mat-toolbar>
+
 <section class="tasks-page">
-  <h1>Gestor de tareas</h1>
-  <p>El componente standalone ya está funcionando.</p>
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{ editingTaskId ? 'Editar tarea' : 'Nueva tarea' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        Gestiona tus tareas de forma dinámica
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form class="task-form" [formGroup]="taskForm" (ngSubmit)="submitForm()">
+        <mat-form-field appearance="outline">
+          <mat-label>Título</mat-label>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Ej. Revisar documentación"
+          />
+          @if (taskForm.controls.title.hasError('required') && taskForm.controls.title.touched) {
+            <mat-error>El título es obligatorio.</mat-error>
+          }
+          @if (taskForm.controls.title.hasError('maxlength')) {
+            <mat-error>Máximo 100 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea
+            matInput
+            rows="4"
+            formControlName="description"
+            placeholder="Añade más detalles si lo necesitas"
+          ></textarea>
+          @if (taskForm.controls.description.hasError('maxlength')) {
+            <mat-error>Máximo 250 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-checkbox formControlName="completed">
+          Marcar como completada
+        </mat-checkbox>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit">
+            {{ editingTaskId ? 'Guardar cambios' : 'Añadir tarea' }}
+          </button>
+
+          <button mat-stroked-button type="button" (click)="resetForm()">
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="list-card">
+    <mat-card-header>
+      <mat-card-title>Listado de tareas</mat-card-title>
+      <mat-card-subtitle>
+        Total: {{ tasks.length }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (tasks.length > 0) {
+        <div class="task-list">
+          @for (task of tasks; track trackByTaskId($index, task)) {
+            <article class="task-item" [class.completed]="!!task.completed">
+              <div class="task-main">
+                <button
+                  mat-icon-button
+                  type="button"
+                  (click)="toggleCompleted(task)"
+                  [attr.aria-label]="task.completed ? 'Marcar como pendiente' : 'Marcar como completada'"
+                >
+                  <mat-icon>
+                    {{ task.completed ? 'check_circle' : 'radio_button_unchecked' }}
+                  </mat-icon>
+                </button>
+
+                <div class="task-info">
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description || 'Sin descripción' }}</p>
+                </div>
+              </div>
+
+              <div class="task-actions">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  type="button"
+                  (click)="editTask(task)"
+                  aria-label="Editar tarea"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  color="warn"
+                  type="button"
+                  (click)="deleteTask(task.id)"
+                  aria-label="Eliminar tarea"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </article>
+
+            <mat-divider></mat-divider>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>assignment</mat-icon>
+          <p>No hay tareas todavía. Añade la primera.</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
 </section>

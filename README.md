@@ -1,59 +1,49 @@
 # TaskManager
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.23.
+Frontend (Angular + Angular Material)
 
-## Development server
+---
 
-To start a local development server, run:
+# 1.Puesta en marcha
+  1.Clonar el repositorio y acceder a la carpeta del frontend:
+    git clone <url-del-repositorio>
+    cd task-manager
 
-```bash
-ng serve
-```
+  O alternativamente, trabajar directamente sobre esta carpeta en local.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# 2.Instalar dependencias
+  npm install
 
-## Code scaffolding
+# 3.Configuración
+  El frontend está configurado para consumir la API en:
+    http://localhost:3000/api/tasks
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+  Asegúrate de que el backend esté en ejecución antes de iniciar la aplicación.
 
-```bash
-ng generate component component-name
-```
+# 4.Levantar la aplicación
+  npm run start
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+  La aplicación estará disponible en:
+    http://localhost:4200
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+# Funcionalidades
+La aplicación permite:
 
-To build the project run:
+  Crear nuevas tareas
+  Visualizar el listado de tareas
+  Editar tareas existentes
+  Marcar tareas como completadas o pendientes
+  Eliminar tareas
 
-```bash
-ng build
-```
+Todas las operaciones están conectadas con la API del backend y persisten en base de datos.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+# NOTAS
+Es necesario que el backend esté en ejecución para el correcto funcionamiento.
+La aplicación utiliza Angular Material para la interfaz de usuario.
+Se emplea Reactive Forms para la gestión de formularios.
+La comunicación con el backend se realiza mediante HttpClient.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# NOTA INFORMATIVA
+Se podría usar un .env en el frontend para no exponer la URL de la API, pero al ser un localhost se ha dejado así para simplificar.

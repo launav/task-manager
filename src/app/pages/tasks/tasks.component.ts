@@ -40,7 +40,7 @@ export class TasksComponent implements OnInit {
   private taskService = inject(TaskService);
   private destroyRef = inject(DestroyRef);
 
-  editingTaskId = signal<string | null>(null);
+  editingTaskId: number | null = null;
 
   tasks: Task[] = [];
 
@@ -86,51 +86,65 @@ export class TasksComponent implements OnInit {
 
     const formValue = this.taskForm.getRawValue();
 
-    if (this.editingTaskId()) {
-      this.tasks = this.tasks.map((task) =>
-        task._id === this.editingTaskId()
-          ? {
-            ...task,
-            title: formValue.title,
-            description: formValue.description,
-            completed: formValue.completed,
-          }
-          : task
-      );
+    if (this.editingTaskId !== null) {
+      // ✏️ UPDATE
+      this.taskService
+        .updateTask(this.editingTaskId, formValue)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.loadTasks();
+            this.resetForm();
 
-      this.snackBar.open('Tarea actualizada correctamente', 'Cerrar', {
-        duration: 2500,
-      });
+            this.snackBar.open('Tarea actualizada correctamente', 'Cerrar', {
+              duration: 2500,
+              panelClass: ['snackbar-success'],
+            });
+          },
+          error: () => {
+            this.snackBar.open('Error al actualizar la tarea', 'Cerrar', {
+              duration: 3000,
+              panelClass: ['snackbar-error'],
+            });
+          },
+        });
+
     } else {
-      const newTask: Task = {
-        _id: crypto.randomUUID(),
-        title: formValue.title,
-        description: formValue.description,
-        completed: formValue.completed,
-        createdAt: new Date().toISOString(),
-      };
+      // ➕ CREATE
+      this.taskService
+        .createTask(formValue)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.loadTasks();
+            this.resetForm();
 
-      this.tasks = [newTask, ...this.tasks];
-
-      this.snackBar.open('Tarea añadida correctamente', 'Cerrar', {
-        duration: 2500,
-      });
+            this.snackBar.open('Tarea añadida correctamente', 'Cerrar', {
+              duration: 2500,
+              panelClass: ['snackbar-success'],
+            });
+          },
+          error: () => {
+            this.snackBar.open('Error al crear la tarea', 'Cerrar', {
+              duration: 3000,
+              panelClass: ['snackbar-error'],
+            });
+          },
+        });
     }
-
-    this.resetForm();
   }
 
   editTask(task: Task): void {
-    this.editingTaskId.set(task._id ?? null);
+    this.editingTaskId = task.id ? Number(task.id) : null;
 
     this.taskForm.patchValue({
       title: task.title,
       description: task.description,
-      completed: task.completed,
+      completed: !!task.completed,
     });
   }
 
-  deleteTask(taskId?: string): void {
+  deleteTask(taskId?: number): void {
     if (!taskId) return;
 
     this.taskService
@@ -155,10 +169,10 @@ export class TasksComponent implements OnInit {
   }
 
   toggleCompleted(task: Task): void {
-    if (!task._id) return;
+    if (!task.id) return;
 
     this.tasks = this.tasks.map((item) =>
-      item._id === task._id
+      item.id === task.id
         ? { ...item, completed: !item.completed }
         : item
     );
@@ -171,11 +185,11 @@ export class TasksComponent implements OnInit {
       completed: false,
     });
 
-    this.editingTaskId.set(null);
+    this.editingTaskId = null;
   }
 
-  trackByTaskId(index: number, task: Task): string {
-    return task._id ?? index.toString();
+  trackByTaskId(index: number, task: Task): number {
+    return task.id ?? index;
   }
 
 
